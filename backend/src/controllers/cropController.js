@@ -12,34 +12,53 @@ exports.getCropRecommendations = async (req, res) => {
     let farmer;
     
     if (isMongoConnected) {
+      // Always fetch fresh farmer data from database
       farmer = await Farmer.findById(req.params.farmerId);
       if (!farmer) {
         return res.status(404).json({ success: false, error: 'Farmer not found' });
       }
-      if (!farmer.soilReport || !farmer.soilReport.reportUrl) {
+      
+      // Check if soil report exists
+      if (!farmer.soilReport || !farmer.soilReport.pH) {
         return res.status(400).json({ 
           success: false, 
-          error: 'Soil report not uploaded' 
+          error: 'Soil report not uploaded. Please complete soil test first.' 
         });
       }
+      
+      console.log('Using farmer data from database:', {
+        farmerId: farmer._id,
+        soilPH: farmer.soilReport.pH,
+        nitrogen: farmer.soilReport.nitrogen,
+        waterAvailability: farmer.waterAvailability?.availability
+      });
     } else {
-      // In demo mode, create mock farmer data
+      // In demo mode, use data from request body or create mock data
+      const requestData = req.body;
+      
       farmer = {
         _id: req.params.farmerId,
-        soilReport: req.body.soilReport || {
+        soilReport: requestData.soilReport || {
           pH: 6.5,
-          nitrogen: 250,
-          phosphorus: 30,
-          potassium: 200,
+          nitrogen: 100,
+          phosphorus: 40,
+          potassium: 100,
           soilType: 'Loamy'
         },
-        location: req.body.location || { state: 'Demo', city: 'Demo', village: 'Demo' },
-        landDetails: req.body.landDetails || { totalArea: 5, unit: 'acres' },
-        waterAvailability: req.body.waterAvailability || { source: 'borewell', availability: 'medium' }
+        location: requestData.location || { state: 'Demo', city: 'Demo', village: 'Demo' },
+        landDetails: requestData.landDetails || { totalArea: 5, unit: 'acres' },
+        waterAvailability: requestData.waterAvailability || { source: 'borewell', availability: 'medium' }
       };
+      
+      console.log('Using farmer data from request (demo mode):', {
+        farmerId: farmer._id,
+        soilPH: farmer.soilReport.pH,
+        nitrogen: farmer.soilReport.nitrogen,
+        waterAvailability: farmer.waterAvailability?.availability
+      });
     }
 
-    // Call ML service for crop recommendations
+    // Call ML service for crop recommendations with latest farmer data
     const mlRecommendations = await mlService.getCropRecommendations({
       soilData: farmer.soilReport,
       location: farmer.location,
@@ -67,10 +86,18 @@ exports.getCropRecommendations = async (req, res) => {
       await savedRec.save();
       res.json({ success: true, data: savedRec });
     } else {
-      inMemoryRecommendations.push(recommendation);
+      // In demo mode, don't accumulate old recommendations
+      // Replace any existing recommendation for this farmer
+      const existingIndex = inMemoryRecommendations.findIndex(r => r.farmerId === req.params.farmerId);
+      if (existingIndex >= 0) {
+        inMemoryRecommendations[existingIndex] = recommendation;
+      } else {
+        inMemoryRecommendations.push(recommendation);
+      }
       res.json({ success: true, data: recommendation });
     }
   } catch (error) {
+    console.error('Error generating recommendations:', error);
     res.status(400).json({ success: false, error: error.message });
   }
 };
@@ -96,13 +123,33 @@ exports.getRecommendationHistory = async (req, res) => {
 };
 
 function calculateLandDivision(recommendations, totalArea) {
-  const topCrops = recommendations
-    .sort((a, b) => b.suitabilityScore - a.suitabilityScore)
-    .slice(0, 3);
+  // Select top crops with diversity in mind
+  const topCrops = [];
+  const usedTypes = new Set();
+  
+  // First pass: Get highest scoring crop from each type
+  for (const crop of recommendations) {
+    if (!usedTypes.has(crop.cropType) && topCrops.length < 5) {
+      topCrops.push(crop);
+      usedTypes.add(crop.cropType);
+    }
+  }
+  
+  // Second pass: Fill remaining slots with highest scoring crops
+  for (const crop of recommendations) {
+    if (topCrops.length >= 5) break;
+    if (!topCrops.find(c => c.cropName === crop.cropName)) {
+      topCrops.push(crop);
+    }
+  }
+  
+  // Take top 3-5 crops based on total area
+  const numCrops = totalArea >= 5 ? 5 : totalArea >= 3 ? 4 : 3;
+  const selectedCrops = topCrops.slice(0, numCrops);
 
-  const totalScore = topCrops.reduce((sum, crop) => sum + crop.suitabilityScore, 0);
+  const totalScore = selectedCrops.reduce((sum, crop) => sum + crop.suitabilityScore, 0);
 
-  return topCrops.map(crop => ({
+  return selectedCrops.map(crop => ({
     cropName: crop.cropName,
     allocatedArea: (crop.suitabilityScore / totalScore) * totalArea,
     percentage: (crop.suitabilityScore / totalScore) * 100

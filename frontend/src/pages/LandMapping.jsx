@@ -59,13 +59,33 @@ function LandMapping() {
     };
   }, []);
 
-  // Log coordinates changes for debugging
+  // Calculate area whenever coordinates change
   useEffect(() => {
-    console.log('Coordinates updated:', coordinates.length, coordinates);
+    console.log('Coordinates changed, length:', coordinates.length, coordinates);
+    
+    if (coordinates.length >= 3) {
+      const areaInSqMeters = calculatePolygonArea(coordinates);
+      const areaInAcres = parseFloat((areaInSqMeters / 4046.86).toFixed(3));
+      const areaInCentsCalc = parseFloat((areaInSqMeters / 40.4686).toFixed(2));
+      
+      console.log('Area calculated:', {
+        sqMeters: areaInSqMeters,
+        acres: areaInAcres,
+        cents: areaInCentsCalc
+      });
+      
+      setArea(areaInAcres);
+      setAreaInCents(areaInCentsCalc);
+    } else {
+      setArea(0);
+      setAreaInCents(0);
+    }
   }, [coordinates]);
 
   const initializeMap = (lat, lng) => {
     if (!mapInstanceRef.current && mapRef.current) {
+      console.log('Initializing map at:', lat, lng);
+      
       const map = L.map(mapRef.current).setView([lat, lng], 18); // Higher zoom for land measurement
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -91,9 +111,12 @@ function LandMapping() {
 
       // Add click event to map
       map.on('click', (e) => {
+        console.log('Map clicked at:', e.latlng);
         const { lat, lng } = e.latlng;
         addMarker(lat, lng);
       });
+      
+      console.log('Map initialized successfully');
     }
   };
 
@@ -112,10 +135,10 @@ function LandMapping() {
       return;
     }
 
-    const newCoords = [...coordinates, { lat, lng }];
+    const newCoord = { lat, lng };
     
     // Add numbered marker
-    const markerNumber = newCoords.length;
+    const markerNumber = coordinates.length + 1;
     const numberIcon = L.divIcon({
       className: 'numbered-marker',
       html: `<div class="marker-number">${markerNumber}</div>`,
@@ -128,27 +151,32 @@ function LandMapping() {
     
     markersRef.current.push(marker);
 
-    // Update state AFTER adding marker
-    setCoordinates(newCoords);
-
-    // Update polygon if we have at least 3 points
-    if (newCoords.length >= 3) {
-      updatePolygon(newCoords);
-    } else if (newCoords.length === 2) {
-      // Draw a line between first two points
-      if (polygonRef.current) {
-        mapInstanceRef.current.removeLayer(polygonRef.current);
+    // Update coordinates state
+    setCoordinates(prevCoords => {
+      const updatedCoords = [...prevCoords, newCoord];
+      console.log('Coordinates updated:', updatedCoords);
+      
+      // Update polygon immediately
+      if (updatedCoords.length >= 3) {
+        updatePolygon(updatedCoords);
+      } else if (updatedCoords.length === 2) {
+        // Draw a line between first two points
+        if (polygonRef.current) {
+          mapInstanceRef.current.removeLayer(polygonRef.current);
+        }
+        const line = L.polyline([
+          [updatedCoords[0].lat, updatedCoords[0].lng],
+          [updatedCoords[1].lat, updatedCoords[1].lng]
+        ], {
+          color: '#2c5f2d',
+          weight: 3,
+          dashArray: '5, 10'
+        }).addTo(mapInstanceRef.current);
+        polygonRef.current = line;
       }
-      const line = L.polyline([
-        [newCoords[0].lat, newCoords[0].lng],
-        [newCoords[1].lat, newCoords[1].lng]
-      ], {
-        color: '#2c5f2d',
-        weight: 3,
-        dashArray: '5, 10'
-      }).addTo(mapInstanceRef.current);
-      polygonRef.current = line;
-    }
+      
+      return updatedCoords;
+    });
   };
 
   const updatePolygon = (coords) => {
@@ -168,14 +196,6 @@ function LandMapping() {
       }).addTo(mapInstanceRef.current);
 
       polygonRef.current = polygon;
-
-      // Calculate area using spherical law of cosines
-      const areaInSqMeters = calculatePolygonArea(coords);
-      const areaInAcres = (areaInSqMeters / 4046.86).toFixed(3);
-      const areaInCentsCalc = (areaInSqMeters / 40.4686).toFixed(2);
-      
-      setArea(areaInAcres);
-      setAreaInCents(areaInCentsCalc);
 
       // Fit map to polygon bounds
       mapInstanceRef.current.fitBounds(polygon.getBounds(), { padding: [50, 50] });
@@ -287,6 +307,22 @@ function LandMapping() {
             📍 My Location
           </button>
         )}
+        <button 
+          type="button" 
+          className="btn-secondary" 
+          onClick={() => {
+            console.log('Current state:', {
+              coordinates: coordinates,
+              coordinatesLength: coordinates.length,
+              area: area,
+              areaInCents: areaInCents,
+              markers: markersRef.current.length
+            });
+            alert(`Coordinates: ${coordinates.length}\nMarkers: ${markersRef.current.length}\nArea: ${area} acres`);
+          }}
+        >
+          🔍 Debug Info
+        </button>
       </div>
       
       <div ref={mapRef} className="map-container"></div>
@@ -297,25 +333,21 @@ function LandMapping() {
           <p className="info-value">{coordinates.length}<span className="info-unit">/4</span></p>
           <small className="info-hint">
             {coordinates.length === 0 && 'Click on map to add points'}
-            {coordinates.length === 1 && 'Add 2 more points'}
-            {coordinates.length === 2 && 'Add 1 more point'}
-            {coordinates.length >= 3 && 'Area calculated!'}
+            {coordinates.length === 1 && 'Add 2 more points to calculate area'}
+            {coordinates.length === 2 && 'Add 1 more point to calculate area'}
+            {coordinates.length >= 3 && '✓ Area calculated!'}
           </small>
         </div>
-        {area > 0 && (
-          <>
-            <div className="info-card highlight">
-              <h3>Area (Acres)</h3>
-              <p className="info-value">{area}</p>
-              <small className="info-hint">acres</small>
-            </div>
-            <div className="info-card highlight">
-              <h3>Area (Cents)</h3>
-              <p className="info-value">{areaInCents}</p>
-              <small className="info-hint">cents</small>
-            </div>
-          </>
-        )}
+        <div className={`info-card ${area > 0 ? 'highlight' : ''}`}>
+          <h3>Area (Acres)</h3>
+          <p className="info-value">{area > 0 ? area.toFixed(3) : '0.000'}</p>
+          <small className="info-hint">acres</small>
+        </div>
+        <div className={`info-card ${areaInCents > 0 ? 'highlight' : ''}`}>
+          <h3>Area (Cents)</h3>
+          <p className="info-value">{areaInCents > 0 ? areaInCents.toFixed(2) : '0.00'}</p>
+          <small className="info-hint">cents (1 acre = 100 cents)</small>
+        </div>
       </div>
 
       {coordinates.length > 0 && (

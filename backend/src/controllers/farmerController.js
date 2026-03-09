@@ -197,3 +197,119 @@ exports.getFarmer = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
+
+// Signup - Create new farmer account
+exports.signup = async (req, res) => {
+  try {
+    const { name, email, password, phone, state, city, village } = req.body;
+
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({ success: false, error: 'Name, email, password, and phone are required' });
+    }
+
+    const isMongoConnected = require('mongoose').connection.readyState === 1;
+    
+    if (isMongoConnected) {
+      // Check if email already exists
+      const existingFarmer = await Farmer.findOne({ 'personalDetails.email': email });
+      if (existingFarmer) {
+        return res.status(400).json({ success: false, error: 'Email already registered' });
+      }
+
+      const farmerData = {
+        personalDetails: {
+          name,
+          email,
+          phone,
+          password // In production, hash this password!
+        }
+      };
+
+      // Add location if provided
+      if (state && city && village) {
+        farmerData.location = {
+          state,
+          city,
+          village
+        };
+      }
+
+      const farmer = new Farmer(farmerData);
+      await farmer.save();
+      res.status(201).json({ success: true, data: farmer });
+    } else {
+      // In-memory mode
+      const existingFarmer = inMemoryFarmers.find(f => f.personalDetails?.email === email);
+      if (existingFarmer) {
+        return res.status(400).json({ success: false, error: 'Email already registered' });
+      }
+
+      const farmer = {
+        _id: `farmer_${farmerIdCounter++}`,
+        personalDetails: {
+          name,
+          email,
+          phone,
+          password
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Add location if provided
+      if (state && city && village) {
+        farmer.location = {
+          state,
+          city,
+          village
+        };
+      }
+
+      inMemoryFarmers.push(farmer);
+      res.status(201).json({ success: true, data: farmer });
+    }
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
+
+// Login - Authenticate farmer
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Email and password are required' });
+    }
+
+    const isMongoConnected = require('mongoose').connection.readyState === 1;
+    
+    if (isMongoConnected) {
+      const farmer = await Farmer.findOne({ 'personalDetails.email': email });
+      if (!farmer) {
+        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+      }
+
+      // In production, use bcrypt to compare hashed passwords
+      if (farmer.personalDetails.password !== password) {
+        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+      }
+
+      res.json({ success: true, data: farmer });
+    } else {
+      // In-memory mode
+      const farmer = inMemoryFarmers.find(f => f.personalDetails?.email === email);
+      if (!farmer) {
+        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+      }
+
+      if (farmer.personalDetails.password !== password) {
+        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+      }
+
+      res.json({ success: true, data: farmer });
+    }
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};

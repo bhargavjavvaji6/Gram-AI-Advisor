@@ -18,6 +18,14 @@ exports.getCropRecommendations = async (farmerData) => {
 function getRuleBasedRecommendations(farmerData) {
   const { soilData, waterAvailability } = farmerData;
   
+  console.log('Generating recommendations with data:', {
+    pH: soilData?.pH,
+    nitrogen: soilData?.nitrogen,
+    phosphorus: soilData?.phosphorus,
+    potassium: soilData?.potassium,
+    waterAvailability: waterAvailability?.availability
+  });
+  
   // Calculate suitability for all crops in database
   const recommendations = cropDatabase.map(crop => {
     const score = calculateCropSuitability(crop, soilData, waterAvailability);
@@ -37,7 +45,16 @@ function getRuleBasedRecommendations(farmerData) {
   // Sort by suitability score and return top recommendations
   const sortedRecommendations = recommendations
     .filter(r => r.suitabilityScore >= 40) // Only show crops with 40%+ suitability
-    .sort((a, b) => b.suitabilityScore - a.suitabilityScore);
+    .sort((a, b) => {
+      // Add slight randomization to break ties and provide variety
+      if (Math.abs(a.suitabilityScore - b.suitabilityScore) <= 5) {
+        return Math.random() - 0.5;
+      }
+      return b.suitabilityScore - a.suitabilityScore;
+    });
+
+  console.log(`Found ${sortedRecommendations.length} suitable crops out of ${cropDatabase.length}`);
+  console.log('Top 10 crops:', sortedRecommendations.slice(0, 10).map(c => `${c.cropName} (${c.suitabilityScore}%)`));
 
   return {
     recommendations: sortedRecommendations,

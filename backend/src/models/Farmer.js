@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const farmerSchema = new mongoose.Schema({
   personalDetails: {
     name: { type: String, required: true },
-    phoneNumber: { type: String, required: true, unique: true },
-    email: { type: String }
+    phoneNumber: { type: String },
+    phone: { type: String },
+    email: { type: String, unique: true, sparse: true },
+    password: { type: String }
   },
   location: {
     state: { type: String, required: true },

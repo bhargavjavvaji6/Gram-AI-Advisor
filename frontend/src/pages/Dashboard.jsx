@@ -8,10 +8,6 @@ function Dashboard() {
   const [farmerData, setFarmerData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadFarmerData();
-  }, [farmerId]);
-
   const loadFarmerData = async () => {
     try {
       // Try to get from backend
@@ -29,6 +25,13 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (farmerId) {
+      loadFarmerData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [farmerId]);
 
   if (loading) {
     return (
@@ -55,7 +58,9 @@ function Dashboard() {
     `${farmerData.location.village}, ${farmerData.location.city}, ${farmerData.location.state}` : 
     '—';
   const hasSoilReport = farmerData.soilReport && farmerData.soilReport.pH;
+  const hasWaterData = farmerData.waterAvailability && farmerData.waterAvailability.availability;
   const farmerName = farmerData.personalDetails?.name || 'Farmer';
+  const canGetAdvice = hasSoilReport && hasWaterData;
 
   return (
     <div className="dashboard-container">
@@ -71,18 +76,13 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
-          <h3>Soil Reports</h3>
-          <p className="stat-value">{hasSoilReport ? '1' : '0'}</p>
-        </div>
-
-        <div className="stat-card">
           <h3>Location</h3>
           <p className="stat-location">{location}</p>
         </div>
 
         <div className="stat-card">
           <h3>Crop Suggestions</h3>
-          <p className="stat-value">{hasSoilReport ? '5' : '0'}</p>
+          <p className="stat-value">{canGetAdvice ? 'Ready' : 'Pending'}</p>
         </div>
       </div>
 
@@ -97,30 +97,30 @@ function Dashboard() {
             <div className="action-icon soil-icon">🌱</div>
             <div className="action-content">
               <h3>Soil Test</h3>
-              <p>{hasSoilReport ? 'Update soil parameters' : 'Enter soil parameters'}</p>
+              <p>{hasSoilReport ? '✓ Updated - Click to modify' : 'Enter soil parameters'}</p>
             </div>
           </button>
 
           <button 
             className="action-card"
-            onClick={() => navigate(`/land-mapping/${farmerId}`)}
+            onClick={() => navigate(`/water-availability/${farmerId}`)}
           >
             <div className="action-icon water-icon">💧</div>
             <div className="action-content">
               <h3>Water Source</h3>
-              <p>Add water details</p>
+              <p>{hasWaterData ? '✓ Updated - Click to modify' : 'Enter water availability'}</p>
             </div>
           </button>
 
           <button 
-            className="action-card"
+            className={`action-card ${canGetAdvice ? 'action-card-primary' : ''}`}
             onClick={() => navigate(`/recommendations/${farmerId}`)}
-            disabled={!hasSoilReport}
+            disabled={!canGetAdvice}
           >
             <div className="action-icon crop-icon">📊</div>
             <div className="action-content">
               <h3>Get Crop Advice</h3>
-              <p>{hasSoilReport ? 'View recommendations' : 'Complete soil test first'}</p>
+              <p>{canGetAdvice ? '✓ Ready - View latest recommendations' : 'Complete soil test and water source first'}</p>
             </div>
           </button>
         </div>
@@ -147,6 +147,37 @@ function Dashboard() {
               <span className="param-value">{farmerData.soilReport.potassium} kg/ha</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {hasWaterData && (
+        <div className="water-summary">
+          <h2>Your Water Availability Summary</h2>
+          <div className="water-params">
+            <div className="water-param">
+              <span className="param-label">Water Source</span>
+              <span className="param-value">{farmerData.waterAvailability.source}</span>
+            </div>
+            <div className="water-param">
+              <span className="param-label">Availability Level</span>
+              <span className={`param-value availability-${farmerData.waterAvailability.availability}`}>
+                {farmerData.waterAvailability.availability}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {canGetAdvice && (
+        <div className="recommendation-prompt">
+          <h2>🌾 Ready for Crop Recommendations!</h2>
+          <p>Your soil and water data is complete. Click "Get Crop Advice" to see personalized recommendations.</p>
+          <button 
+            className="get-advice-btn"
+            onClick={() => navigate(`/recommendations/${farmerId}`)}
+          >
+            Get Crop Advice Now →
+          </button>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -7,14 +7,45 @@ function SoilReport() {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [soilData, setSoilData] = useState({
     soilType: 'Loamy',
-    pH: '7.60',
-    nitrogen: '112.89',
-    phosphorus: '21.18',
-    potassium: '123.6',
-    organicCarbon: '0.24'
+    pH: '',
+    nitrogen: '',
+    phosphorus: '',
+    potassium: '',
+    organicCarbon: ''
   });
+
+  // Load existing soil data if farmer already has it
+  useEffect(() => {
+    const loadExistingSoilData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/farmers/${farmerId}`);
+        const farmerData = response.data.data;
+        
+        // If farmer has existing soil report, load it
+        if (farmerData.soilReport && farmerData.soilReport.pH) {
+          setSoilData({
+            soilType: farmerData.soilReport.soilType || 'Loamy',
+            pH: farmerData.soilReport.pH.toString(),
+            nitrogen: farmerData.soilReport.nitrogen.toString(),
+            phosphorus: farmerData.soilReport.phosphorus.toString(),
+            potassium: farmerData.soilReport.potassium.toString(),
+            organicCarbon: farmerData.soilReport.organicCarbon.toString()
+          });
+        }
+      } catch (error) {
+        console.log('No existing soil data found or farmer not in backend');
+      } finally {
+        setInitialLoad(false);
+      }
+    };
+
+    if (farmerId) {
+      loadExistingSoilData();
+    }
+  }, [farmerId]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -93,13 +124,21 @@ function SoilReport() {
     navigate(`/recommendations/${farmerId}`);
   };
 
+  if (initialLoad) {
+    return (
+      <div className="soil-report-container">
+        <div className="loading">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="soil-report-container">
       <h1>Soil Test Report</h1>
       <p className="subtitle">Enter your soil analysis details from lab report</p>
 
       <div className="soil-report-example">
-        <p>💡 <strong>Tip:</strong> Enter values from your soil test report. Sample values are pre-filled based on typical Indian soil.</p>
+        <p>💡 <strong>Tip:</strong> Enter values from your soil test report. Leave blank if you don't have a report yet.</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -142,7 +181,7 @@ function SoilReport() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="pH">pH Level (1:2.5)</label>
+            <label htmlFor="pH">pH Level (1:2.5) <span className="required">*</span></label>
             <input
               id="pH"
               type="number"
@@ -158,7 +197,7 @@ function SoilReport() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="nitrogen">Nitrogen - N (kg/ha)</label>
+            <label htmlFor="nitrogen">Nitrogen - N (kg/ha) <span className="required">*</span></label>
             <input
               id="nitrogen"
               type="number"
@@ -172,7 +211,7 @@ function SoilReport() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phosphorus">Phosphorus - P₂O₅ (kg/ha)</label>
+            <label htmlFor="phosphorus">Phosphorus - P₂O₅ (kg/ha) <span className="required">*</span></label>
             <input
               id="phosphorus"
               type="number"
@@ -186,7 +225,7 @@ function SoilReport() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="potassium">Potassium - K₂O (kg/ha)</label>
+            <label htmlFor="potassium">Potassium - K₂O (kg/ha) <span className="required">*</span></label>
             <input
               id="potassium"
               type="number"
@@ -200,7 +239,7 @@ function SoilReport() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="organicCarbon">Organic Carbon - OC (%)</label>
+            <label htmlFor="organicCarbon">Organic Carbon - OC (%) <span className="required">*</span></label>
             <input
               id="organicCarbon"
               type="number"

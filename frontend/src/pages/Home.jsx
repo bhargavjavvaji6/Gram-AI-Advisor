@@ -1,7 +1,48 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 function Home() {
   const navigate = useNavigate();
+
+  const checkAuthentication = async () => {
+    const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+    const farmerId = sessionStorage.getItem('currentFarmerId');
+
+    if (isAuthenticated && farmerId) {
+      try {
+        // Verify farmer still exists in backend
+        const response = await axios.get(`http://localhost:5000/api/farmers/${farmerId}`);
+        const farmer = response.data.data;
+
+        // If farmer has completed land details, go to dashboard
+        if (farmer.landDetails && farmer.landDetails.totalArea) {
+          navigate(`/dashboard/${farmerId}`);
+        } else {
+          // Otherwise continue to land details
+          navigate('/land-details');
+        }
+      } catch (error) {
+        // If farmer not found, clear session and stay on home
+        sessionStorage.clear();
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkAuthentication();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleGetStarted = () => {
+    const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+    
+    if (isAuthenticated) {
+      navigate('/land-details');
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
     <div className="home-container">
@@ -32,7 +73,7 @@ function Home() {
 
         <button 
           className="get-started-btn"
-          onClick={() => navigate('/registration')}
+          onClick={handleGetStarted}
         >
           Get Started
           <span className="arrow">→</span>

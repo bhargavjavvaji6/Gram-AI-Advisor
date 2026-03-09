@@ -3,6 +3,10 @@ const router = express.Router();
 const farmerController = require('../controllers/farmerController');
 const upload = require('../utils/upload');
 
+// Authentication
+router.post('/signup', farmerController.signup);
+router.post('/login', farmerController.login);
+
 // Farmer registration
 router.post('/register', farmerController.registerFarmer);
 

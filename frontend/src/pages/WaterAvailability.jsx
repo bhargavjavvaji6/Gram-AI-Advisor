@@ -1,15 +1,42 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function WaterAvailability() {
   const navigate = useNavigate();
+  const { farmerId } = useParams(); // Optional - only present when updating from dashboard
   const [formData, setFormData] = useState({
     source: 'borewell',
     availability: 'medium'
   });
 
   const [loading, setLoading] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+
+  const loadExistingWaterData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/farmers/${farmerId}`);
+      const farmerData = response.data.data;
+      
+      if (farmerData.waterAvailability) {
+        setFormData({
+          source: farmerData.waterAvailability.source || 'borewell',
+          availability: farmerData.waterAvailability.availability || 'medium'
+        });
+      }
+    } catch (error) {
+      console.log('No existing water data found');
+    }
+  };
+
+  // Load existing water data if updating from dashboard
+  useEffect(() => {
+    if (farmerId) {
+      setIsUpdate(true);
+      loadExistingWaterData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [farmerId]);
 
   const waterSources = [
     { value: 'borewell', label: '🚰 Borewell', icon: '🚰' },
@@ -38,7 +65,29 @@ function WaterAvailability() {
     setLoading(true);
 
     try {
-      // Get registration data from sessionStorage
+      // If updating from dashboard
+      if (isUpdate && farmerId) {
+        // Get existing farmer data
+        const response = await axios.get(`http://localhost:5000/api/farmers/${farmerId}`);
+        const farmerData = response.data.data;
+
+        // Update water availability
+        const updatedData = {
+          ...farmerData,
+          waterAvailability: {
+            source: formData.source,
+            availability: formData.availability
+          }
+        };
+
+        await axios.put(`http://localhost:5000/api/farmers/${farmerId}`, updatedData);
+        
+        alert('Water availability updated successfully!');
+        navigate(`/dashboard/${farmerId}`);
+        return;
+      }
+
+      // Original registration flow
       const registrationDataStr = sessionStorage.getItem('registrationData');
       
       if (!registrationDataStr) {
@@ -74,32 +123,29 @@ function WaterAvailability() {
         throw new Error('Invalid response from server');
       }
 
-      const farmerId = response.data.data._id;
+      const newFarmerId = response.data.data._id;
 
       // Store farmer ID and data for next steps
-      sessionStorage.setItem('currentFarmerId', farmerId);
+      sessionStorage.setItem('currentFarmerId', newFarmerId);
       sessionStorage.setItem('farmerData', JSON.stringify(response.data.data));
 
       // Clear old registration data
       sessionStorage.removeItem('personalDetails');
 
-      console.log('Registration successful, farmer ID:', farmerId);
+      console.log('Registration successful, farmer ID:', newFarmerId);
 
       // Navigate to land mapping
-      navigate(`/land-mapping/${farmerId}`);
+      navigate(`/land-mapping/${newFarmerId}`);
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Error:', error);
       
-      let errorMessage = 'Registration failed. ';
+      let errorMessage = isUpdate ? 'Update failed. ' : 'Registration failed. ';
       
       if (error.response) {
-        // Server responded with error
         errorMessage += error.response.data?.error || error.response.statusText;
       } else if (error.request) {
-        // Request made but no response
         errorMessage += 'Server not responding. Please check if backend is running.';
       } else {
-        // Other errors
         errorMessage += error.message;
       }
       
@@ -110,21 +156,27 @@ function WaterAvailability() {
   };
 
   const handleBack = () => {
-    navigate('/land-details');
+    if (isUpdate && farmerId) {
+      navigate(`/dashboard/${farmerId}`);
+    } else {
+      navigate('/land-details');
+    }
   };
 
   return (
     <div className="registration-container water-availability-page">
-      <div className="progress-bar">
-        <div className="progress-step completed">1</div>
-        <div className="progress-line completed"></div>
-        <div className="progress-step completed">2</div>
-        <div className="progress-line completed"></div>
-        <div className="progress-step active">3</div>
-      </div>
+      {!isUpdate && (
+        <div className="progress-bar">
+          <div className="progress-step completed">1</div>
+          <div className="progress-line completed"></div>
+          <div className="progress-step completed">2</div>
+          <div className="progress-line completed"></div>
+          <div className="progress-step active">3</div>
+        </div>
+      )}
 
       <h1>Water Availability</h1>
-      <p className="subtitle">Tell us about your water sources</p>
+      <p className="subtitle">{isUpdate ? 'Update your water source information' : 'Tell us about your water sources'}</p>
 
       <form onSubmit={handleSubmit}>
         <div className="form-section">
@@ -171,12 +223,12 @@ function WaterAvailability() {
           className="complete-registration-btn"
           disabled={loading}
         >
-          {loading ? 'Registering...' : 'Complete Registration'}
+          {loading ? (isUpdate ? 'Updating...' : 'Registering...') : (isUpdate ? 'Update Water Details' : 'Complete Registration')}
           <span className="arrow">→</span>
         </button>
 
         <button type="button" className="back-btn" onClick={handleBack}>
-          ← Back
+          ← Back {isUpdate ? 'to Dashboard' : ''}
         </button>
       </form>
     </div>
