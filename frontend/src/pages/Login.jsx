@@ -7,10 +7,11 @@ function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrPhone: '',
     password: '',
     name: '',
     phone: '',
+    email: '',
     state: '',
     city: '',
     village: ''
@@ -25,9 +26,14 @@ function Login() {
     setLoading(true);
 
     try {
+      console.log('Attempting login with:', { emailOrPhone: formData.emailOrPhone });
       const response = await axios.post('http://localhost:5000/api/farmers/login', {
-        email: formData.email,
+        emailOrPhone: formData.emailOrPhone,
         password: formData.password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       const farmer = response.data.data;
@@ -125,6 +131,9 @@ function Login() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-left">
+          <div className="auth-logo">
+            <img src="/favicon.svg" alt="Gram AI Advisor" className="logo-image" />
+          </div>
           <h1 className="auth-title">Sign {isSignUp ? 'Up' : 'In'}</h1>
           
           <div className="social-login">
@@ -157,6 +166,14 @@ function Login() {
                   placeholder="Phone Number *"
                   value={formData.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
+                  required
+                  className="auth-input"
+                />
+                <input
+                  type="email"
+                  placeholder="Email Address *"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   required
                   className="auth-input"
                 />
@@ -215,14 +232,16 @@ function Login() {
               </>
             )}
             
-            <input
-              type="email"
-              placeholder="Email Address *"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              required
-              className="auth-input"
-            />
+            {!isSignUp && (
+              <input
+                type="text"
+                placeholder="Email ID / Mobile Number *"
+                value={formData.emailOrPhone}
+                onChange={(e) => handleChange('emailOrPhone', e.target.value)}
+                required
+                className="auth-input"
+              />
+            )}
             
             <input
               type="password"

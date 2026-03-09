@@ -1865,19 +1865,20 @@ input[type="checkbox"] {
 
 /* Authentication Page Styles */
 .auth-container {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  overflow: hidden;
 }
 
 .auth-card {
   display: flex;
   width: 100%;
   max-width: 900px;
-  min-height: 500px;
+  max-height: 90vh;
   background: white;
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -1886,17 +1887,19 @@ input[type="checkbox"] {
 
 .auth-left {
   flex: 1;
-  padding: 60px 50px;
+  padding: 30px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: white;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .auth-right {
   flex: 1;
-  padding: 60px 50px;
+  padding: 40px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1906,22 +1909,33 @@ input[type="checkbox"] {
   text-align: center;
 }
 
+.auth-logo {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.logo-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
 .auth-title {
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
   color: #2c3e50;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .social-login {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 15px;
 }
 
 .social-btn {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   border: 2px solid #e0e0e0;
   background: white;
@@ -1930,7 +1944,7 @@ input[type="checkbox"] {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -1971,18 +1985,18 @@ input[type="checkbox"] {
 
 .auth-divider {
   color: #95a5a6;
-  font-size: 14px;
-  margin: 20px 0;
+  font-size: 13px;
+  margin: 15px 0;
 }
 
 .auth-input {
   width: 100%;
-  padding: 15px 20px;
-  margin: 10px 0;
+  padding: 12px 18px;
+  margin: 8px 0;
   border: none;
   background: #f0f0f0;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   transition: all 0.3s;
 }
 
@@ -1994,9 +2008,9 @@ input[type="checkbox"] {
 
 .forgot-password {
   color: #667eea;
-  font-size: 14px;
+  font-size: 13px;
   text-decoration: none;
-  margin: 10px 0 20px;
+  margin: 8px 0 15px;
   display: inline-block;
 }
 
@@ -2006,16 +2020,16 @@ input[type="checkbox"] {
 
 .auth-submit-btn {
   width: 100%;
-  padding: 15px 40px;
+  padding: 12px 40px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 25px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  margin-top: 10px;
+  margin-top: 8px;
   letter-spacing: 1px;
 }
 
@@ -2031,25 +2045,25 @@ input[type="checkbox"] {
 }
 
 .auth-welcome {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .auth-welcome-text {
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 40px;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 30px;
   opacity: 0.95;
 }
 
 .auth-toggle-btn {
-  padding: 15px 60px;
+  padding: 12px 50px;
   background: transparent;
   color: white;
   border: 2px solid white;
   border-radius: 25px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -2456,51 +2470,88 @@ button:not(.social-btn):not(.auth-toggle-btn):disabled {
 }
 
 .income-projection {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  padding: 25px;
+  border-radius: 12px;
   margin-top: 20px;
+  border: 2px solid #4CAF50;
 }
 
 .income-projection h4 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: #2c5f2d;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .income-breakdown {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .income-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 12px 15px;
+  background: white;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.income-row:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.income-row.separator {
+  border-top: 2px solid #e0e0e0;
+  margin-top: 8px;
+  padding-top: 15px;
 }
 
 .income-row.total {
-  border-top: 2px solid #e0e0e0;
-  padding-top: 15px;
+  border-top: 3px solid #4CAF50;
+  padding: 15px;
   margin-top: 10px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 18px;
+  background: #e8f5e9;
+}
+
+.income-row span:first-child {
+  color: #555;
+  font-size: 15px;
 }
 
 .income-value {
-  font-weight: 600;
+  font-weight: 700;
   color: #2c3e50;
+  font-size: 16px;
+}
+
+.income-value.highlight {
+  color: #2c5f2d;
+  font-size: 17px;
 }
 
 .income-value.positive {
   color: #27ae60;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .income-value.negative {
   color: #e74c3c;
+  font-size: 16px;
+}
+
+.income-note {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #7f8c8d;
+  font-style: italic;
+  text-align: center;
 }
 
 .crop-expanded {
@@ -3352,4 +3403,423 @@ button:not(.social-btn):not(.auth-toggle-btn):disabled {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   background: #f8f9fa;
+}
+
+/* Image Upload Styles */
+.image-upload-container {
+  margin-top: 10px;
+}
+
+.field-description {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.image-input {
+  display: none;
+}
+
+.image-upload-label {
+  display: block;
+  cursor: pointer;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s;
+  background: #f8f9fa;
+}
+
+.image-upload-label:hover {
+  border-color: #2c5f2d;
+  background: #f0f7f0;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-icon {
+  font-size: 48px;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.upload-hint {
+  font-size: 13px;
+  color: #95a5a6;
+}
+
+.image-preview {
+  position: relative;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.change-image {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #2c5f2d;
+  font-weight: 500;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #7f8c8d;
+  text-align: center;
+}
+
+/* Auth Input for Land Details */
+.auth-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #2c5f2d;
+}
+
+.auth-input.error {
+  border-color: #e74c3c;
+}
+
+/* Dashboard Sign Out Button */
+.dashboard-footer {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sign-out-btn {
+  padding: 12px 30px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sign-out-btn:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* Land Visualization Styles */
+.land-visualization {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.land-map-container {
+  margin-top: 20px;
+}
+
+/* Image-based land overlay */
+.land-image-overlay-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  border: 3px solid #2c5f2d;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.land-base-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.land-overlay-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Fallback SVG map */
+.land-map-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border: 3px solid #2c5f2d;
+  border-radius: 12px;
+  background: #f8f9fa;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+.land-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.legend-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .land-image-overlay-container,
+  .land-map-svg {
+    max-width: 100%;
+  }
+  
+  .legend-item {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .legend-color {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Two Column Overview Layout */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.overview-left,
+.overview-right {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.overview-left .analysis-factors,
+.overview-left .income-summary,
+.overview-right .land-visualization {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.overview-left .analysis-factors h2,
+.overview-left .income-summary h2,
+.overview-right .land-visualization h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c5f2d;
+  font-size: 22px;
+}
+
+/* Make land visualization sticky on scroll */
+.overview-right .land-visualization {
+  position: sticky;
+  top: 20px;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-right .land-visualization {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Adjust factors grid for left column */
+.overview-left .factors-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.overview-left .factor-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #4CAF50;
+}
+
+.overview-left .factor-icon {
+  font-size: 32px;
+}
+
+.overview-left .factor-label {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.overview-left .factor-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c5f2d;
+  margin: 5px 0 0 0;
+}
+
+/* Income card in left column */
+.overview-left .income-card-large {
+  background: linear-gradient(135deg, #4CAF50 0%, #2c5f2d 100%);
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+}
+
+.overview-left .income-amount {
+  font-size: 42px;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.overview-left .income-subtitle {
+  font-size: 16px;
+  opacity: 0.95;
+  margin: 0;
+}
+
+/* Income Projection Section Headers */
+.income-section-header {
+  background: #2c5f2d;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 15px 0 10px 0;
+  font-size: 15px;
+}
+
+.income-section-header:first-child {
+  margin-top: 0;
+}
+
+/* Investment Row Highlight */
+.income-row.investment-row {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.investment-details {
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 10px 0;
+  border-left: 3px solid #6c757d;
+}
+
+.investment-details small {
+  color: #6c757d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Enhanced Total Row */
+.income-row.total {
+  border-top: 3px solid #4CAF50;
+  padding: 18px 15px;
+  margin-top: 15px;
+  font-weight: 700;
+  font-size: 18px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 8px;
+}
+
+/* Download Report Button */
+.stat-card-action {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.download-report-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4CAF50 0%, #2c5f2d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.download-report-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.download-report-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.download-report-btn:active:not(:disabled) {
+  transform: translateY(0);
 }

@@ -4,24 +4,34 @@ import axios from 'axios';
 
 // Crop income data (per acre in INR)
 const cropIncomeData = {
-  'Rice': { pricePerQuintal: 2100, yieldPerAcre: 25, duration: '120-150 days' },
-  'Wheat': { pricePerQuintal: 2015, yieldPerAcre: 20, duration: '120-150 days' },
-  'Cotton': { pricePerQuintal: 6620, yieldPerAcre: 8, duration: '150-180 days' },
-  'Sugarcane': { pricePerQuintal: 315, yieldPerAcre: 350, duration: '12-18 months' },
-  'Maize': { pricePerQuintal: 1963, yieldPerAcre: 22, duration: '90-120 days' },
-  'Groundnut': { pricePerQuintal: 5885, yieldPerAcre: 12, duration: '100-150 days' },
-  'Soybean': { pricePerQuintal: 4300, yieldPerAcre: 10, duration: '90-120 days' },
-  'Tomato': { pricePerQuintal: 2500, yieldPerAcre: 200, duration: '60-90 days' },
-  'Potato': { pricePerQuintal: 1500, yieldPerAcre: 150, duration: '90-120 days' },
-  'Onion': { pricePerQuintal: 2200, yieldPerAcre: 120, duration: '120-150 days' },
-  'Cabbage': { pricePerQuintal: 1800, yieldPerAcre: 180, duration: '90-120 days' },
-  'Cauliflower': { pricePerQuintal: 2000, yieldPerAcre: 160, duration: '90-120 days' },
-  'Radish': { pricePerQuintal: 1200, yieldPerAcre: 100, duration: '30-45 days' },
-  'Carrot': { pricePerQuintal: 2500, yieldPerAcre: 120, duration: '90-120 days' },
-  'Brinjal': { pricePerQuintal: 2000, yieldPerAcre: 140, duration: '120-150 days' },
-  'Chilli': { pricePerQuintal: 8000, yieldPerAcre: 15, duration: '150-180 days' },
-  'Turmeric': { pricePerQuintal: 7500, yieldPerAcre: 25, duration: '7-9 months' },
-  'Ginger': { pricePerQuintal: 10000, yieldPerAcre: 50, duration: '8-10 months' }
+  'Rice': { pricePerQuintal: 2100, yieldPerAcre: 25, duration: '120-150 days', costPerAcre: 35000 },
+  'Wheat': { pricePerQuintal: 2015, yieldPerAcre: 20, duration: '120-150 days', costPerAcre: 28000 },
+  'Cotton': { pricePerQuintal: 6620, yieldPerAcre: 8, duration: '150-180 days', costPerAcre: 45000 },
+  'Sugarcane': { pricePerQuintal: 315, yieldPerAcre: 350, duration: '12-18 months', costPerAcre: 85000 },
+  'Maize': { pricePerQuintal: 1963, yieldPerAcre: 22, duration: '90-120 days', costPerAcre: 25000 },
+  'Groundnut': { pricePerQuintal: 5885, yieldPerAcre: 12, duration: '100-150 days', costPerAcre: 32000 },
+  'Soybean': { pricePerQuintal: 4300, yieldPerAcre: 10, duration: '90-120 days', costPerAcre: 22000 },
+  'Tomato': { pricePerQuintal: 2500, yieldPerAcre: 200, duration: '60-90 days', costPerAcre: 80000 },
+  'Potato': { pricePerQuintal: 1500, yieldPerAcre: 150, duration: '90-120 days', costPerAcre: 55000 },
+  'Onion': { pricePerQuintal: 2200, yieldPerAcre: 120, duration: '120-150 days', costPerAcre: 48000 },
+  'Cabbage': { pricePerQuintal: 1800, yieldPerAcre: 180, duration: '90-120 days', costPerAcre: 42000 },
+  'Cauliflower': { pricePerQuintal: 2000, yieldPerAcre: 160, duration: '90-120 days', costPerAcre: 45000 },
+  'Radish': { pricePerQuintal: 1200, yieldPerAcre: 100, duration: '30-45 days', costPerAcre: 18000 },
+  'Carrot': { pricePerQuintal: 2500, yieldPerAcre: 120, duration: '90-120 days', costPerAcre: 38000 },
+  'Brinjal': { pricePerQuintal: 2000, yieldPerAcre: 140, duration: '120-150 days', costPerAcre: 40000 },
+  'Chilli': { pricePerQuintal: 8000, yieldPerAcre: 15, duration: '150-180 days', costPerAcre: 50000 },
+  'Turmeric': { pricePerQuintal: 7500, yieldPerAcre: 25, duration: '7-9 months', costPerAcre: 65000 },
+  'Ginger': { pricePerQuintal: 10000, yieldPerAcre: 50, duration: '8-10 months', costPerAcre: 95000 },
+  'Coriander': { pricePerQuintal: 6000, yieldPerAcre: 8, duration: '45-60 days', costPerAcre: 15000 },
+  'Oat': { pricePerQuintal: 1800, yieldPerAcre: 18, duration: '90-120 days', costPerAcre: 20000 },
+  'Barley': { pricePerQuintal: 1650, yieldPerAcre: 20, duration: '120-150 days', costPerAcre: 24000 },
+  'Mustard': { pricePerQuintal: 5500, yieldPerAcre: 10, duration: '90-120 days', costPerAcre: 18000 },
+  'Sunflower': { pricePerQuintal: 6200, yieldPerAcre: 12, duration: '90-120 days', costPerAcre: 28000 },
+  'Peanut': { pricePerQuintal: 5885, yieldPerAcre: 12, duration: '100-150 days', costPerAcre: 32000 },
+  'Chickpea': { pricePerQuintal: 5200, yieldPerAcre: 10, duration: '120-150 days', costPerAcre: 22000 },
+  'Pigeon Pea': { pricePerQuintal: 6500, yieldPerAcre: 8, duration: '150-180 days', costPerAcre: 25000 },
+  'Green Gram': { pricePerQuintal: 7500, yieldPerAcre: 6, duration: '60-90 days', costPerAcre: 18000 },
+  'Black Gram': { pricePerQuintal: 7800, yieldPerAcre: 6, duration: '75-90 days', costPerAcre: 20000 }
 };
 
 // Government schemes
@@ -72,6 +82,7 @@ function Recommendations() {
   const [selectedCrop, setSelectedCrop] = useState(null);
   const [showSchemes, setShowSchemes] = useState(false);
   const [showAllCrops, setShowAllCrops] = useState(false);
+  const [landImage, setLandImage] = useState(null);
 
   const handleApplyScheme = (scheme) => {
     // Show confirmation dialog
@@ -107,6 +118,12 @@ function Recommendations() {
       // Always fetch fresh recommendations when page loads
       // This ensures we use the latest soil and water data
       fetchRecommendations();
+      
+      // Load land image from sessionStorage
+      const savedLandImage = sessionStorage.getItem('landImagePreview');
+      if (savedLandImage) {
+        setLandImage(savedLandImage);
+      }
     }
   }, [farmerId]); // Added dependency
 
@@ -135,28 +152,50 @@ function Recommendations() {
   };
 
   const calculateIncome = (cropName, area) => {
+    console.log('Calculating income for:', cropName, 'Area:', area);
+    
     const cropData = cropIncomeData[cropName];
     if (!cropData) {
+      console.warn('No crop data found for:', cropName);
+      // Provide default values if crop not found
+      const defaultYield = 15;
+      const defaultPrice = 3000;
+      const defaultCost = 30000;
+      
+      const grossIncome = defaultPrice * defaultYield * area;
+      const cultivationCost = defaultCost * area;
+      const netIncome = grossIncome - cultivationCost;
+      
       return { 
-        gross: 0, 
-        cost: 0, 
-        net: 0, 
-        duration: 'N/A', 
-        yield: 0, 
-        price: 0 
+        gross: grossIncome, 
+        cost: cultivationCost, 
+        net: netIncome, 
+        duration: '90-120 days', 
+        yield: defaultYield * area, 
+        price: defaultPrice 
       };
     }
 
-    const grossIncome = cropData.pricePerQuintal * cropData.yieldPerAcre * area;
-    const cultivationCost = grossIncome * 0.4; // Assume 40% cultivation cost
+    const totalYield = cropData.yieldPerAcre * area;
+    const grossIncome = cropData.pricePerQuintal * totalYield;
+    const cultivationCost = cropData.costPerAcre * area;
     const netIncome = grossIncome - cultivationCost;
 
+    console.log('Income calculation:', {
+      cropName,
+      area,
+      totalYield,
+      grossIncome,
+      cultivationCost,
+      netIncome
+    });
+
     return {
-      gross: grossIncome,
-      cost: cultivationCost,
-      net: netIncome,
+      gross: Math.round(grossIncome),
+      cost: Math.round(cultivationCost),
+      net: Math.round(netIncome),
       duration: cropData.duration,
-      yield: cropData.yieldPerAcre * area,
+      yield: totalYield,
       price: cropData.pricePerQuintal
     };
   };
@@ -235,40 +274,254 @@ function Recommendations() {
         <h1>🌾 Crop Recommendations for Your Land</h1>
       </div>
 
-      <section className="analysis-factors">
-        <h2>Analysis Factors</h2>
-        <div className="factors-grid">
-          <div className="factor-card">
-            <span className="factor-icon">🌱</span>
-            <div>
-              <p className="factor-label">Soil Quality</p>
-              <p className="factor-value">{recommendations?.factors?.soilQuality || 'N/A'}</p>
+      {/* Two Column Layout: Left (Analysis + Income) | Right (Land Division) */}
+      <div className="overview-grid">
+        {/* Left Column */}
+        <div className="overview-left">
+          <section className="analysis-factors">
+            <h2>Analysis Factors</h2>
+            <div className="factors-grid">
+              <div className="factor-card">
+                <span className="factor-icon">🌱</span>
+                <div>
+                  <p className="factor-label">Soil Quality</p>
+                  <p className="factor-value">{recommendations?.factors?.soilQuality || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="factor-card">
+                <span className="factor-icon">💧</span>
+                <div>
+                  <p className="factor-label">Water Availability</p>
+                  <p className="factor-value">{recommendations?.factors?.waterAvailability || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="factor-card">
+                <span className="factor-icon">🌤️</span>
+                <div>
+                  <p className="factor-label">Climate Condition</p>
+                  <p className="factor-value">{recommendations?.factors?.climateCondition || 'N/A'}</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="factor-card">
-            <span className="factor-icon">💧</span>
-            <div>
-              <p className="factor-label">Water Availability</p>
-              <p className="factor-value">{recommendations?.factors?.waterAvailability || 'N/A'}</p>
-            </div>
-          </div>
-          <div className="factor-card">
-            <span className="factor-icon">🌤️</span>
-            <div>
-              <p className="factor-label">Climate Condition</p>
-              <p className="factor-value">{recommendations?.factors?.climateCondition || 'N/A'}</p>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <section className="income-summary">
-        <h2>💰 Estimated Total Annual Income</h2>
-        <div className="income-card-large">
-          <p className="income-amount">{formatCurrency(totalIncome)}</p>
-          <p className="income-subtitle">Net income from all recommended crops</p>
+          <section className="income-summary">
+            <h2>💰 Estimated Total Annual Income</h2>
+            <div className="income-card-large">
+              <p className="income-amount">{formatCurrency(totalIncome)}</p>
+              <p className="income-subtitle">Net income from all recommended crops</p>
+            </div>
+          </section>
         </div>
-      </section>
+
+        {/* Right Column */}
+        <div className="overview-right">
+          <section className="land-visualization">
+            <h2>Your Land Division Plan</h2>
+            <p className="section-subtitle">Visual representation of how to divide your {recommendations?.landDivisionStrategy?.reduce((sum, d) => sum + (d.allocatedArea || 0), 0).toFixed(1) || 0} acres</p>
+            
+            <div className="land-map-container">
+              {landImage ? (
+                // Use actual uploaded land image with overlays
+                <div className="land-image-overlay-container">
+                  <img src={landImage} alt="Your Land" className="land-base-image" />
+                  <svg className="land-overlay-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    {/* Draw crop divisions as overlays on the image */}
+                    {recommendations?.landDivisionStrategy?.map((division, index) => {
+                      const totalArea = recommendations.landDivisionStrategy.reduce((sum, d) => sum + (d.allocatedArea || 0), 0);
+                      const percentage = (division.allocatedArea / totalArea) * 100;
+                      
+                      // Calculate positions for different sections
+                      let x = 0, y = 0, width = 0, height = 0;
+                      
+                      if (index === 0) {
+                        x = 0;
+                        y = 0;
+                        width = 100;
+                        height = percentage;
+                      } else if (index === 1) {
+                        const prevHeight = (recommendations.landDivisionStrategy[0].allocatedArea / totalArea) * 100;
+                        x = 0;
+                        y = prevHeight;
+                        width = 100;
+                        height = percentage;
+                      } else if (index === 2) {
+                        const prevHeight1 = (recommendations.landDivisionStrategy[0].allocatedArea / totalArea) * 100;
+                        const prevHeight2 = (recommendations.landDivisionStrategy[1].allocatedArea / totalArea) * 100;
+                        x = 0;
+                        y = prevHeight1 + prevHeight2;
+                        width = 100;
+                        height = percentage;
+                      } else {
+                        const usedHeight = recommendations.landDivisionStrategy.slice(0, 3).reduce((sum, d) => 
+                          sum + ((d.allocatedArea / totalArea) * 100), 0
+                        );
+                        const remainingHeight = 100 - usedHeight;
+                        const numRemaining = recommendations.landDivisionStrategy.length - 3;
+                        x = ((index - 3) * (100 / numRemaining));
+                        y = usedHeight;
+                        width = 100 / numRemaining;
+                        height = remainingHeight;
+                      }
+                      
+                      // Color palette for crops with transparency
+                      const colors = ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800'];
+                      const color = colors[index % colors.length];
+                      
+                      return (
+                        <g key={index}>
+                          <rect
+                            x={x}
+                            y={y}
+                            width={width}
+                            height={height}
+                            fill={color}
+                            stroke="#fff"
+                            strokeWidth="0.5"
+                            opacity="0.6"
+                          />
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 - 2}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="4"
+                            fontWeight="bold"
+                            stroke="#000"
+                            strokeWidth="0.2"
+                          >
+                            {division.cropName}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 2}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="3"
+                            stroke="#000"
+                            strokeWidth="0.15"
+                          >
+                            {division.allocatedArea?.toFixed(1)} acres
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 5}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="2.5"
+                            stroke="#000"
+                            strokeWidth="0.15"
+                          >
+                            ({percentage.toFixed(0)}%)
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                </div>
+              ) : (
+                // Fallback to SVG if no image uploaded
+                <svg viewBox="0 0 400 300" className="land-map-svg">
+                  {recommendations?.landDivisionStrategy?.map((division, index) => {
+                    const totalArea = recommendations.landDivisionStrategy.reduce((sum, d) => sum + (d.allocatedArea || 0), 0);
+                    const percentage = (division.allocatedArea / totalArea) * 100;
+                    
+                    let x = 0, y = 0, width = 0, height = 0;
+                    
+                    if (index === 0) {
+                      x = 0;
+                      y = 0;
+                      width = 400;
+                      height = 300 * (percentage / 100);
+                    } else if (index === 1) {
+                      const prevHeight = 300 * (recommendations.landDivisionStrategy[0].allocatedArea / totalArea);
+                      x = 0;
+                      y = prevHeight;
+                      width = 400;
+                      height = 300 * (percentage / 100);
+                    } else if (index === 2) {
+                      const prevHeight1 = 300 * (recommendations.landDivisionStrategy[0].allocatedArea / totalArea);
+                      const prevHeight2 = 300 * (recommendations.landDivisionStrategy[1].allocatedArea / totalArea);
+                      x = 0;
+                      y = prevHeight1 + prevHeight2;
+                      width = 400;
+                      height = 300 * (percentage / 100);
+                    } else {
+                      const usedHeight = recommendations.landDivisionStrategy.slice(0, 3).reduce((sum, d) => 
+                        sum + (300 * (d.allocatedArea / totalArea)), 0
+                      );
+                      const remainingHeight = 300 - usedHeight;
+                      const numRemaining = recommendations.landDivisionStrategy.length - 3;
+                      x = ((index - 3) * (400 / numRemaining));
+                      y = usedHeight;
+                      width = 400 / numRemaining;
+                      height = remainingHeight;
+                    }
+                    
+                    const colors = ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800'];
+                    const color = colors[index % colors.length];
+                    
+                    return (
+                      <g key={index}>
+                        <rect
+                          x={x}
+                          y={y}
+                          width={width}
+                          height={height}
+                          fill={color}
+                          stroke="#fff"
+                          strokeWidth="3"
+                          opacity="0.8"
+                        />
+                        <text
+                          x={x + width / 2}
+                          y={y + height / 2 - 10}
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="14"
+                          fontWeight="bold"
+                        >
+                          {division.cropName}
+                        </text>
+                        <text
+                          x={x + width / 2}
+                          y={y + height / 2 + 10}
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="12"
+                        >
+                          {division.allocatedArea?.toFixed(1)} acres
+                        </text>
+                        <text
+                          x={x + width / 2}
+                          y={y + height / 2 + 28}
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="11"
+                        >
+                          ({percentage.toFixed(0)}%)
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              )}
+              
+              <div className="land-legend">
+                {recommendations?.landDivisionStrategy?.map((division, index) => {
+                  const colors = ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800'];
+                  return (
+                    <div key={index} className="legend-item">
+                      <span className="legend-color" style={{ backgroundColor: colors[index % colors.length] }}></span>
+                      <span className="legend-text">{division.cropName} - {division.allocatedArea?.toFixed(1)} acres</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
 
       <section className="crop-list">
         <h2>Your Personalized Crop Plan</h2>
@@ -330,29 +583,40 @@ function Recommendations() {
               </div>
 
               <div className="income-projection">
-                <h4>Income Projection for {division.allocatedArea?.toFixed(1) || 0} Acres</h4>
+                <h4>💰 Financial Plan for {division.allocatedArea?.toFixed(1) || 0} Acres</h4>
                 <div className="income-breakdown">
+                  <div className="income-section-header">
+                    <strong>📊 Production Details</strong>
+                  </div>
                   <div className="income-row">
                     <span>Expected Yield:</span>
-                    <span className="income-value">{income.yield?.toFixed(1) || 0} quintals</span>
+                    <span className="income-value highlight">{income.yield?.toFixed(1) || 0} quintals</span>
                   </div>
                   <div className="income-row">
-                    <span>Market Price:</span>
-                    <span className="income-value">{formatCurrency(income.price)}/quintal</span>
+                    <span>Market Price (Reference):</span>
+                    <span className="income-value highlight">{formatCurrency(income.price)} per quintal</span>
+                  </div>
+                  
+                  <div className="income-section-header">
+                    <strong>💵 Financial Breakdown</strong>
                   </div>
                   <div className="income-row">
-                    <span>Gross Income:</span>
+                    <span>Gross Income (Total Sales):</span>
                     <span className="income-value">{formatCurrency(income.gross)}</span>
                   </div>
-                  <div className="income-row">
-                    <span>Cultivation Cost:</span>
-                    <span className="income-value negative">-{formatCurrency(income.cost)}</span>
+                  <div className="income-row investment-row">
+                    <span><strong>💰 Investment Required:</strong></span>
+                    <span className="income-value negative"><strong>{formatCurrency(income.cost)}</strong></span>
+                  </div>
+                  <div className="investment-details">
+                    <small>Includes: Seeds, Fertilizers, Pesticides, Labor, Irrigation, Equipment</small>
                   </div>
                   <div className="income-row total">
-                    <span>Net Income:</span>
-                    <span className="income-value positive">{formatCurrency(income.net)}</span>
+                    <span><strong>✅ Net Profit (Your Earnings):</strong></span>
+                    <span className="income-value positive"><strong>{formatCurrency(income.net)}</strong></span>
                   </div>
                 </div>
+                <p className="income-note">* Market prices and costs are indicative. Actual values may vary by region and season.</p>
               </div>
 
               {selectedCrop === division.cropName && (

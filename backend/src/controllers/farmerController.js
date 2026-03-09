@@ -276,35 +276,49 @@ exports.signup = async (req, res) => {
 // Login - Authenticate farmer
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    console.log('Login request body:', req.body);
+    const { emailOrPhone, password } = req.body;
+    console.log('Extracted emailOrPhone:', emailOrPhone, 'password:', password ? '***' : 'undefined');
 
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Email and password are required' });
+    if (!emailOrPhone || !password) {
+      return res.status(400).json({ success: false, error: 'Email/Phone and password are required' });
     }
 
     const isMongoConnected = require('mongoose').connection.readyState === 1;
     
     if (isMongoConnected) {
-      const farmer = await Farmer.findOne({ 'personalDetails.email': email });
+      // Check if input is email or phone
+      const isEmail = emailOrPhone.includes('@');
+      const query = isEmail 
+        ? { 'personalDetails.email': emailOrPhone }
+        : { 'personalDetails.phone': emailOrPhone };
+      
+      const farmer = await Farmer.findOne(query);
       if (!farmer) {
-        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        return res.status(401).json({ success: false, error: 'Invalid credentials' });
       }
 
       // In production, use bcrypt to compare hashed passwords
       if (farmer.personalDetails.password !== password) {
-        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        return res.status(401).json({ success: false, error: 'Invalid credentials' });
       }
 
       res.json({ success: true, data: farmer });
     } else {
       // In-memory mode
-      const farmer = inMemoryFarmers.find(f => f.personalDetails?.email === email);
+      const isEmail = emailOrPhone.includes('@');
+      const farmer = inMemoryFarmers.find(f => 
+        isEmail 
+          ? f.personalDetails?.email === emailOrPhone
+          : f.personalDetails?.phone === emailOrPhone
+      );
+      
       if (!farmer) {
-        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        return res.status(401).json({ success: false, error: 'Invalid credentials' });
       }
 
       if (farmer.personalDetails.password !== password) {
-        return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        return res.status(401).json({ success: false, error: 'Invalid credentials' });
       }
 
       res.json({ success: true, data: farmer });

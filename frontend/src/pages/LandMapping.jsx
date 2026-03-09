@@ -20,6 +20,8 @@ function LandMapping() {
   const [areaInCents, setAreaInCents] = useState(0);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
+  const [enteredLandSize, setEnteredLandSize] = useState(null);
+  const [enteredLandUnit, setEnteredLandUnit] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const polygonRef = useRef(null);
@@ -27,6 +29,14 @@ function LandMapping() {
   const currentLocationMarkerRef = useRef(null);
 
   useEffect(() => {
+    // Retrieve entered land size from sessionStorage
+    const savedLandSize = sessionStorage.getItem('landSize');
+    const savedLandUnit = sessionStorage.getItem('landUnit');
+    if (savedLandSize) {
+      setEnteredLandSize(savedLandSize);
+      setEnteredLandUnit(savedLandUnit || 'acres');
+    }
+
     // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -307,27 +317,18 @@ function LandMapping() {
             📍 My Location
           </button>
         )}
-        <button 
-          type="button" 
-          className="btn-secondary" 
-          onClick={() => {
-            console.log('Current state:', {
-              coordinates: coordinates,
-              coordinatesLength: coordinates.length,
-              area: area,
-              areaInCents: areaInCents,
-              markers: markersRef.current.length
-            });
-            alert(`Coordinates: ${coordinates.length}\nMarkers: ${markersRef.current.length}\nArea: ${area} acres`);
-          }}
-        >
-          🔍 Debug Info
-        </button>
       </div>
       
       <div ref={mapRef} className="map-container"></div>
 
       <div className="map-info">
+        {enteredLandSize && (
+          <div className="info-card highlight">
+            <h3>Entered Land Size</h3>
+            <p className="info-value">{enteredLandSize}<span className="info-unit"> {enteredLandUnit}</span></p>
+            <small className="info-hint">From land details page</small>
+          </div>
+        )}
         <div className="info-card">
           <h3>Marked Points</h3>
           <p className="info-value">{coordinates.length}<span className="info-unit">/4</span></p>
@@ -339,12 +340,12 @@ function LandMapping() {
           </small>
         </div>
         <div className={`info-card ${area > 0 ? 'highlight' : ''}`}>
-          <h3>Area (Acres)</h3>
+          <h3>Calculated Area (Acres)</h3>
           <p className="info-value">{area > 0 ? area.toFixed(3) : '0.000'}</p>
           <small className="info-hint">acres</small>
         </div>
         <div className={`info-card ${areaInCents > 0 ? 'highlight' : ''}`}>
-          <h3>Area (Cents)</h3>
+          <h3>Calculated Area (Cents)</h3>
           <p className="info-value">{areaInCents > 0 ? areaInCents.toFixed(2) : '0.00'}</p>
           <small className="info-hint">cents (1 acre = 100 cents)</small>
         </div>
